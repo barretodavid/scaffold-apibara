@@ -1,0 +1,18 @@
+{
+    "name": "Dev Environment",
+    "dockerComposeFile": "docker-compose.yml",
+    "service": "dev",
+    "workspaceFolder": "/app",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "StarkWare.cairo1",
+                "tamasfe.even-better-toml",
+                "dbaeumer.vscode-eslint",
+                "esbenp.prettier-vscode",
+                "ms-vscode.vscode-typescript-next"
+            ]
+        }
+    },
+    "forwardPorts": [3000, 5050]
+}

@@ -1,0 +1,38 @@
+services:
+  devnet:
+    image: shardlabs/starknet-devnet-rs:latest
+    command: --seed 0 --account-class cairo1
+    ports:
+      - "5050:5050"
+    restart: always
+
+  apibara:
+    image: quay.io/apibara/starknet:latest
+    command: start
+    environment:
+      - NAME=devnet
+      - RPC=http://devnet:5050/rpc
+      - WAIT_FOR_RPC=true
+      - ADDRESS=0.0.0.0:7171
+      - HEAD_REFRESH_INTERVAL_MS=1000
+    ports:
+      - "7171:7171"
+    depends_on:
+      devnet:
+        condition: service_started
+
+  dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: sleep infinity
+    volumes:
+      - ..:/app
+    working_dir: /app
+    ports:
+      - "3000:3000"
+    depends_on:
+      devnet:
+        condition: service_started
+      apibara:
+        condition: service_started
