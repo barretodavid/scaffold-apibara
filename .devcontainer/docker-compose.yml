@@ -31,8 +31,3 @@ services:
     working_dir: /app
     ports:
       - "3000:3000"
-    depends_on:
-      devnet:
-        condition: service_started
-      apibara:
-        condition: service_started
