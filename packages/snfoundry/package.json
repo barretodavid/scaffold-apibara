@@ -23,13 +23,10 @@
     "tslib": "^2.6.2"
   },
   "devDependencies": {
-    "@types/node": "^20",
     "@types/prettier": "^2",
     "@types/yargs": "^17.0.32",
     "globals": "^15.8.0",
     "shx": "^0.4.0",
-    "ts-node": "^10.9.2",
-    "typescript": "^5",
     "typescript-eslint": "^7.16.1",
     "yargs": "^17.7.2"
   },

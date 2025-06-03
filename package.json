@@ -7,11 +7,12 @@
   "workspaces": {
     "packages": [
       "packages/snfoundry",
-      "packages/nextjs"
+      "packages/nextjs",
+      "packages/indexer"
     ]
   },
   "scripts": {
-    "chain": "yarn workspace @ss-2/snfoundry chain",
+    "indexer:start": "yarn workspace @ss-2/indexer start",
     "compile": "yarn workspace @ss-2/snfoundry compile",
     "deploy": "yarn workspace @ss-2/snfoundry deploy",
     "deploy:clear": "yarn workspace @ss-2/snfoundry deploy:clear",
@@ -32,10 +33,13 @@
     "postcss": "^8.4.38"
   },
   "devDependencies": {
+    "@types/node": "^22.15.29",
     "daisyui": "^4.7.3",
     "husky": "^9.0.11",
     "pinst": "^3.0.0",
-    "prettier": "^3.2.5"
+    "prettier": "^3.2.5",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
   },
   "packageManager": "yarn@3.2.3"
 }
