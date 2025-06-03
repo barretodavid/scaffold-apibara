@@ -1,9 +1,23 @@
 {
   "name": "@ss-2/indexer",
   "version": "0.1.0",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "private": true,
+  "type": "module",
   "scripts": {
-    "start": "ts-node src/index.ts"
-  }
+    "prepare": "apibara prepare",
+    "dev": "apibara dev",
+    "start": "apibara start",
+    "build": "apibara build",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@apibara/protocol": "next",
+    "@apibara/starknet": "next",
+    "apibara": "next"
+  },
+  "devDependencies": {
+    "@types/node": "^20.5.2",
+    "typescript": "^5.6.2"
+  },
+  "packageManager": "yarn@4.9.1"
 }

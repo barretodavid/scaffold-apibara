@@ -1,2 +1,6 @@
-dist/
-node_modules/ 
+node_modules
+dist
+.apibara
+.env
+.DS_Store
+.yarn
