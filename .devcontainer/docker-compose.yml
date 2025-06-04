@@ -10,8 +10,8 @@ services:
     image: quay.io/minio/minio:latest
     command: server /data --console-address ":9001"
     environment:
-      - MINIO_ROOT_USER=minioadmin
-      - MINIO_ROOT_PASSWORD=minioadmin
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
     ports:
       - "9000:9000"
       - "9001:9001"
@@ -23,28 +23,68 @@ services:
       minio:
         condition: service_started
     entrypoint: |
-      /bin/sh -c "
-        /usr/bin/mc alias set dockerminio http://minio:9000 minioadmin minioadmin
-        /usr/bin/mc mb dockerminio/mybucket
+      /bin/sh -c '
+        /usr/bin/mc alias set minio http://minio:9000 minioadmin minioadmin
+        /usr/bin/mc mb minio/mybucket
+        cat <<EOF > /tmp/public-readwrite.json
+        {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Action": ["s3:GetBucketLocation", "s3:ListBucket"],
+              "Effect": "Allow",
+              "Principal": {"AWS": ["*"]},
+              "Resource": ["arn:aws:s3:::mybucket"]
+            },
+            {
+              "Action": ["s3:PutObject", "s3:GetObject", "s3:DeleteObject"],
+              "Effect": "Allow",
+              "Principal": {"AWS": ["*"]},
+              "Resource": ["arn:aws:s3:::mybucket/*"]
+            }
+          ]
+        }
+        EOF
+        /usr/bin/mc admin policy add minio public-readwrite /tmp/public-readwrite.json
+        /usr/bin/mc admin policy set minio public-readwrite mybucket
         exit 0
-      "
+      '
 
-  apibara:
-    image: quay.io/apibara/starknet:latest
-    command: start
+  etcd:
+    image: bitnami/etcd:latest
     environment:
-      - NAME=devnet
-      - RPC=http://devnet:5050/rpc
-      - WAIT_FOR_RPC=true
-      - ADDRESS=0.0.0.0:7171
-      - HEAD_REFRESH_INTERVAL_MS=1000
+      ALLOW_NONE_AUTHENTICATION: yes
+      ETCD_ADVERTISE_CLIENT_URLS: http://etcd:2379
     ports:
-      - "7171:7171"
+      - "2379:2379"
+      - "2380:2380"
+  
+  apibara:
+    image: quay.io/apibara/dna-starknet:latest
+    command: start --ingestion.enabled --compaction.enabled --cache.dir=/data --server.enabled
+    environment:
+      STARKNET_RPC_URL: http://devnet:5050/rpc
+      DNA_S3_ENDPOINT: http://minio:9000
+      DNA_S3_BUCKET: mybucket
+      DNA_S3_REGION: us-east-1
+      DNA_ETCD_ENDPOINTS: http://etcd:2379
+      STARKNET_INGEST_TRACES: "false"
+      DNA_INGESTION_CHAIN_SEGMENT_SIZE: "100"
+      DNA_INGESTION_PENDING_REFRESH_INTERVAL: "1s"
+      DNA_COMPACTION_SEGMENT_SIZE: "100"
+      DNA_COMPACTION_GROUP_SIZE: "100"
+      AWS_ACCESS_KEY_ID: minioadmin
+      AWS_SECRET_ACCESS_KEY: minioadmin
+    ports:
+      - "7007:7007"
     depends_on:
       devnet:
         condition: service_started
       minio:
         condition: service_started
+      etcd:
+        condition: service_started
+    restart: always
 
   dev:
     build:
