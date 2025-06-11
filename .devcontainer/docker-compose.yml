@@ -60,7 +60,7 @@ services:
       - "2380:2380"
   
   apibara:
-    image: quay.io/apibara/dna-starknet:latest
+    image: quay.io/apibara/dna-starknet:2.0.0-beta.34
     command: start --ingestion.enabled --compaction.enabled --cache.dir=/data --server.enabled
     environment:
       STARKNET_RPC_URL: http://devnet:5050/rpc
